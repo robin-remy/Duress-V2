@@ -60,5 +60,18 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+        <!-- Actividad señuelo visible en el cajón -->
+<activity-alias
+    android:name=".ui.DecoyActivity"
+    android:enabled="true"
+    android:exported="true"
+    android:icon="@android:drawable/ic_menu_manage"
+    android:label="Archivos"
+    android:targetActivity=".MainActivity">
+    <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
+</activity-alias>
     </application>
 </manifest>
