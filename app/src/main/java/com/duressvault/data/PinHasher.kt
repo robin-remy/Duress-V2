@@ -1,54 +1,31 @@
 package com.duressvault.data
 
-import com.lambdapioneer.argon2kt.Argon2Kt
-import com.lambdapioneer.argon2kt.Argon2Mode
-import java.nio.ByteBuffer
 import java.security.SecureRandom
+import javax.crypto.SecretKeyFactory
+import javax.crypto.spec.PBEKeySpec
 
 object PinHasher {
-    private const val MEMORY_KiB = 64 * 1024
-    private const val ITERATIONS = 5
-    private const val PARALLELISM = 1
-    private const val HASH_LENGTH = 32
-    private const val SALT_LENGTH = 16
-
-    private val argon2 = Argon2Kt()
+    private const val PBKDF2_ITERATIONS = 100_000
+    private const val HASH_LENGTH_BITS = 256
+    private const val SALT_LENGTH_BYTES = 16
 
     data class HashResult(val hash: ByteArray, val salt: ByteArray)
 
     fun hashPin(pin: CharArray): HashResult {
-        val salt = ByteArray(SALT_LENGTH).apply { SecureRandom().nextBytes(this) }
-        val passwordBytes = pin.concatToString().toByteArray(Charsets.UTF_8)
-
-        val result = argon2.hash(
-            mode = Argon2Mode.ARGON2_ID,
-            password = ByteBuffer.wrap(passwordBytes),
-            salt = ByteBuffer.wrap(salt),
-            tCostInIterations = ITERATIONS,
-            mCostInKibibyte = MEMORY_KiB,
-            parallelism = PARALLELISM,
-            hashLengthInBytes = HASH_LENGTH
-        )
-
-        passwordBytes.fill(0)
-        return HashResult(result.rawHash, salt)
+        val salt = ByteArray(SALT_LENGTH_BYTES).apply { SecureRandom().nextBytes(this) }
+        val hash = pbkdf2(pin, salt)
+        return HashResult(hash, salt)
     }
 
     fun verifyPin(pin: CharArray, salt: ByteArray, expectedHash: ByteArray): Boolean {
-        val passwordBytes = pin.concatToString().toByteArray(Charsets.UTF_8)
+        val computedHash = pbkdf2(pin, salt)
+        return constantTimeEquals(computedHash, expectedHash)
+    }
 
-        val result = argon2.hash(
-            mode = Argon2Mode.ARGON2_ID,
-            password = ByteBuffer.wrap(passwordBytes),
-            salt = ByteBuffer.wrap(salt),
-            tCostInIterations = ITERATIONS,
-            mCostInKibibyte = MEMORY_KiB,
-            parallelism = PARALLELISM,
-            hashLengthInBytes = HASH_LENGTH
-        )
-
-        passwordBytes.fill(0)
-        return constantTimeEquals(result.rawHash, expectedHash)
+    private fun pbkdf2(pin: CharArray, salt: ByteArray): ByteArray {
+        val spec = PBEKeySpec(pin, salt, PBKDF2_ITERATIONS, HASH_LENGTH_BITS)
+        val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
+        return factory.generateSecret(spec).encoded
     }
 
     private fun constantTimeEquals(a: ByteArray, b: ByteArray): Boolean {
