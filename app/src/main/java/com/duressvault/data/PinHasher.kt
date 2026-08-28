@@ -17,28 +17,36 @@ object PinHasher {
 
     fun hashPin(pin: CharArray): HashResult {
         val salt = ByteArray(SALT_LENGTH).apply { SecureRandom().nextBytes(this) }
+        val passwordBytes = pin.concatToString().toByteArray(Charsets.UTF_8)
+
         val hash = argon2.hash(
             mode = Argon2Mode.ARGON2_ID,
-            password = pin.concatToString().toByteArray(Charsets.UTF_8),
+            password = passwordBytes,
             salt = salt,
             tCostInIterations = ITERATIONS,
             mCostInKibibyte = MEMORY_KiB,
             parallelism = PARALLELISM,
             hashLengthInBytes = HASH_LENGTH
         ).rawHash
+
+        passwordBytes.fill(0) // limpiar
         return HashResult(hash, salt)
     }
 
     fun verifyPin(pin: CharArray, salt: ByteArray, expectedHash: ByteArray): Boolean {
+        val passwordBytes = pin.concatToString().toByteArray(Charsets.UTF_8)
+
         val computedHash = argon2.hash(
             mode = Argon2Mode.ARGON2_ID,
-            password = pin.concatToString().toByteArray(Charsets.UTF_8),
+            password = passwordBytes,
             salt = salt,
             tCostInIterations = ITERATIONS,
             mCostInKibibyte = MEMORY_KiB,
             parallelism = PARALLELISM,
             hashLengthInBytes = HASH_LENGTH
         ).rawHash
+
+        passwordBytes.fill(0)
         return constantTimeEquals(computedHash, expectedHash)
     }
 
