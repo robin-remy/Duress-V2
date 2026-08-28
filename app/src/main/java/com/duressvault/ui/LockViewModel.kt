@@ -1,12 +1,13 @@
 package com.duressvault.ui
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.duressvault.DuressApp
 import com.duressvault.admin.WipeManager
 import kotlinx.coroutines.launch
 
-class LockViewModel : ViewModel() {
+class LockViewModel(application: Application) : AndroidViewModel(application) {
 
     fun onPinEntered(pin: String) {
         viewModelScope.launch {
@@ -19,8 +20,7 @@ class LockViewModel : ViewModel() {
             } else {
                 val isNormal = app.pinRepository.verifyPin(pinChars, isDuress = false)
                 if (isNormal) {
-                    // Desbloqueo normal: cerrar actividad
-                    // (Se puede enviar evento a la Activity)
+                    // Desbloqueo normal: cerrar actividad (puedes emitir un evento)
                 } else {
                     // PIN incorrecto
                 }
