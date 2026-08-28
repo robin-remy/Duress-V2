@@ -32,6 +32,6 @@ class PinRepository(private val context: Context) {
     }
 
     fun hasPinsConfigured(): Boolean {
-        return prefs.contains("normal_hash") || prefs.contains("duress_hash")
+        return prefs.contains("normal_hash") && prefs.contains("duress_hash")
     }
 }
