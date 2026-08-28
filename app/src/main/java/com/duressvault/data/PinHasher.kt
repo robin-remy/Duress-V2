@@ -21,10 +21,10 @@ object PinHasher {
             mode = Argon2Mode.ARGON2_ID,
             password = pin.concatToString().toByteArray(Charsets.UTF_8),
             salt = salt,
-            tCost = ITERATIONS,
-            mCost = MEMORY_KiB,
+            tCostInIterations = ITERATIONS,
+            mCostInKibibyte = MEMORY_KiB,
             parallelism = PARALLELISM,
-            outputLength = HASH_LENGTH
+            hashLengthInBytes = HASH_LENGTH
         ).rawHash
         return HashResult(hash, salt)
     }
@@ -34,10 +34,10 @@ object PinHasher {
             mode = Argon2Mode.ARGON2_ID,
             password = pin.concatToString().toByteArray(Charsets.UTF_8),
             salt = salt,
-            tCost = ITERATIONS,
-            mCost = MEMORY_KiB,
+            tCostInIterations = ITERATIONS,
+            mCostInKibibyte = MEMORY_KiB,
             parallelism = PARALLELISM,
-            outputLength = HASH_LENGTH
+            hashLengthInBytes = HASH_LENGTH
         ).rawHash
         return constantTimeEquals(computedHash, expectedHash)
     }
