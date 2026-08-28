@@ -2,6 +2,7 @@ package com.duressvault.data
 
 import com.lambdapioneer.argon2kt.Argon2Kt
 import com.lambdapioneer.argon2kt.Argon2Mode
+import java.nio.ByteBuffer
 import java.security.SecureRandom
 
 object PinHasher {
@@ -21,8 +22,8 @@ object PinHasher {
 
         val result = argon2.hash(
             mode = Argon2Mode.ARGON2_ID,
-            password = passwordBytes,
-            salt = salt,
+            password = ByteBuffer.wrap(passwordBytes),
+            salt = ByteBuffer.wrap(salt),
             tCostInIterations = ITERATIONS,
             mCostInKibibyte = MEMORY_KiB,
             parallelism = PARALLELISM,
@@ -38,8 +39,8 @@ object PinHasher {
 
         val result = argon2.hash(
             mode = Argon2Mode.ARGON2_ID,
-            password = passwordBytes,
-            salt = salt,
+            password = ByteBuffer.wrap(passwordBytes),
+            salt = ByteBuffer.wrap(salt),
             tCostInIterations = ITERATIONS,
             mCostInKibibyte = MEMORY_KiB,
             parallelism = PARALLELISM,
