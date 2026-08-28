@@ -1,9 +1,11 @@
 package com.duressvault.ui
 
+import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -69,8 +71,7 @@ fun SetupScreen() {
                 scope.launch {
                     app.pinRepository.setPin(pin1.toCharArray(), isDuress = false)
                     app.pinRepository.setPin(pin2.toCharArray(), isDuress = true)
-                    // Cerrar actividad
-                    (context as? android.app.Activity)?.finish()
+                    (context as? Activity)?.finish()
                 }
             }
         }) {
